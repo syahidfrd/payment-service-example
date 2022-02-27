@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"payment/model"
+	pb "payment/proto-store-example"
 
 	"google.golang.org/grpc"
 )
 
 type PaymentService struct {
-	model.UnimplementedPaymentServiceServer
+	pb.UnimplementedPaymentServiceServer
 }
 
-func (PaymentService) CreatePayment(ctx context.Context, req *model.CreatePaymentRequest) (*model.CreatePaymentResponse, error) {
+func (PaymentService) CreatePayment(ctx context.Context, req *pb.CreatePaymentRequest) (*pb.CreatePaymentResponse, error) {
 	paymentLink := fmt.Sprintf("https://test.payment.com/code=%s", req.OrderId)
-	return &model.CreatePaymentResponse{
+	return &pb.CreatePaymentResponse{
 		PaymentLink: paymentLink,
 	}, nil
 }
@@ -24,7 +24,7 @@ func (PaymentService) CreatePayment(ctx context.Context, req *model.CreatePaymen
 func main() {
 	grpcServer := grpc.NewServer()
 	var paymentSvc PaymentService
-	model.RegisterPaymentServiceServer(grpcServer, paymentSvc)
+	pb.RegisterPaymentServiceServer(grpcServer, paymentSvc)
 
 	listener, err := net.Listen("tcp", ":3000")
 	if err != nil {
